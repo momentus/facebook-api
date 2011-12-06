@@ -19,8 +19,11 @@ class Facebook {
 		//setup facebook obj
 		$this->application_id = $config["app_id"];
 		$this->application_secret = $config["app_secret"];
-		if($config["fb_canvas_url"]){
+		if(isset($config["fb_canvas_url"])){
 			$this->facebook_canvas_url = $config["fb_canvas_url"];
+		}
+		if(isset($config["redirect_uri"])){
+			$this->redirect_uri = $config["redirect_uri"];
 		}
 	}
 	
@@ -45,47 +48,61 @@ class Facebook {
 		
 	}
 	
-	public function getAuthUri($redirect_uri, $perms){
+	public function getAuthUri($perms){
 		/* 
 			create the url that initiates the authentication process 
 			
 		*/
-		if(!$redirect_uri){
-			$redirect_uri = $this->facebook_canvas_url;
-		} 
-		$this->redirect_uri = $redirect_uri;
-		$auth_uri = $this->auth_base_url . "/dialog/oauth?client_id=".$this->application_id."&scope=".$perms."&".$this->application_secret."&redirect_uri=".urlencode($redirect_uri);
+		
+		$auth_uri = $this->auth_base_url."/dialog/oauth?";
+		$auth_uri .= "client_id=".$this->application_id."&";
+		$auth_uri .= "scope=".$perms."&";
+		$auth_uri .= "client_secret=".$this->application_secret."&";
+		$auth_uri .= "redirect_uri=".urlencode($this->redirect_uri);
 		return $auth_uri;
 	
 	}
-	
-	public function getAccessToken($params){
-		/* get the access token again from Facebook, with a valid code (passed in or in request) 
-		*/
-	
-		/* may require one or both or neither params "code" and "redirect_uri"
-			 Note: redirect_uri must be the same one used in the creation of the initial auth link.
-			 The redirect_uri must also be the same domain as in the facebook app definition
-		*/
-		if(isset($this->access_token) && strlen($this->access_token) > 15){
-			return $this->access_token;
-		}
-		if($_REQUEST['code'] && ($params["code"] == "")){
-			$code = $_REQUEST['code'];
-		}
-		if($params["code"]){
-			$code = $params["code"];
-		}
-		if(isset($params["redirect_uri"])){
-			$this->redirect_uri = $params["redirect_uri"];
-		}
-	
-		$graph_uri = $this->graph_url . "/oauth/access_token?code=".$code."&redirect_uri=".urlencode($this->redirect_uri);
+	public function getAccessTokenFromCode($code){
+		$graph_uri = $this->graph_url . "/oauth/access_token?";
+		$graph_uri .= "code=".$code."&";
+		$graph_uri .= "client_secret=".$this->application_secret."&";
+		$graph_uri .= "client_id=".$this->application_id."&";
+		$graph_uri .= "redirect_uri=".urlencode($this->redirect_uri);
 		$graph_results = file_get_contents($graph_uri);
 		parse_str($graph_results);
 		if(isset($access_token)){
 			$this->access_token = $access_token;
 			return $this->access_token;
+		}
+	}
+	
+	public function getAccessToken($params){
+		/* a more global way of getting access token
+		
+		  - if redirect_uri and code passed in, will get back from Facebook
+		  - if code not passed in, check request object
+		  - if redirect_uri is not passed in, get from facebook obj
+		*/
+	
+		if(isset($this->access_token) && strlen($this->access_token) > 15){
+			return $this->access_token;
+		}
+		/* not passed in but in request object */
+		if(isset($_REQUEST['code']) && ($params["code"] == "")){
+			$code = $_REQUEST['code'];			
+		}
+		/* passed in */
+		if(isset($params["code"])){
+			$code = $params["code"];
+		}
+		/* passed in */
+		if(isset($params["redirect_uri"])){
+			$this->redirect_uri = $params["redirect_uri"];
+		}
+		if(!isset($this->redirect_uri)){
+			return nil;
+		} else {
+			$access_token = $this->getAccessTokenFromCode($code);
 		}
 	}
 	
