@@ -1,2 +1,47 @@
 This is a more lightweight, less cookie-dependent api and sdk library for Facebook using PHP
 
+FacebookAPI
+
+These are our favorite methods in the PHP SDK, but opened up publicly, and stripped down so that the method isn't doing any other logic behind the scenes. I was inspired by Koala, the lightweight library for Ruby. The goal in our methods are:
+-Enable load balancing on Amazon servers. No single machine dependency. 
+-Do not require client cookies- many browsers block third party cookies.
+-Allow for a user experience that is both unauthenticated and authenticated. 
+-For apps in the frame, tab, canvas, or outside of it.
+
+This explanation, including code, is also in "test.php"
+
+First, instantiate the Facebook object:
+Pass in the application id, secret, canvas URL (if canvas), and the redirect uri. The redirect uri is required for authentication.
+
+$facebook = new Facebook(
+  array(
+		'app_id'=>"My app id", 
+		'app_secret'=>"my app secret",
+		'fb_canvas_url'=>"https://apps.facebook.com/yourappnamespace/",
+		'redirect_uri'=>"https://apps.facebook.com/yourappnamespace/yourpage.php"
+	)
+);
+
+Already Auth'd or In a Frame?
+If your app is in a frame,tab, or canvas, you may want to see what's in the signed request- which includes the user's minimum or max age, ID, etc. This also will set the local access token if it's there. This is handy for a flow for users that haven't authenticated, or for returning users, to forward them to another page.<br>
+
+$signed_request = $facebook->getSignedRequest();
+
+You may want to simply check and validate the request. This method returns the user's Facebook ID. This is similar to PHP-SDK's "getUser()" method. If the user has authenticated, it establishes the tokens, if not, it still returns the ID. This will also manually check back with Facebook if the user has authenticated the app. Good for out-of-frame apps.
+
+$facebook->checkRequest();
+
+You can also explicitly get the access token (and set it to fb obj) via:
+$facebook->getAccessTokenFromCode($code,$redirect_uri); 
+Redirect uri is optional, otherwise will get the facebook object's redirect uri
+
+Authenticate Your App
+Use this url to log users in, and accept permissions.
+$auth_uri = $facebook->getAuthUri(array("publish_stream,user_photos"));
+
+Get Data from Facebook Graph
+The first argument is the Graph Object-- the User, the photo, the event, etc. The second argument is an array containing any Graph parameters you wish- "since" date to narrow results, here I've passed "limit" to limit the result, and "fields" to show only the attributes of the object I'm interested in.
+
+The result is a standard object format (it's the default json decode format). 
+
+$photos = $facebook->api("me/photos", array("fields"=>"images", "limit"=>"10"));
