@@ -1,3 +1,8 @@
+<?php
+require("/var/www/html/tools/facebook-api/facebook.php");
+include("/var/www/html/tools/dBug.php");
+
+?>
 <html>
 <head>
 <style>

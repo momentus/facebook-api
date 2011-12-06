@@ -15,7 +15,7 @@ class Facebook {
 	public $graph_url = "https://graph.facebook.com";
 	public $auth_base_url = "https://www.facebook.com";
 
-	function __construct($config) {
+	function __construct($config = array()) {
 		//setup facebook obj
 		$this->application_id = $config["app_id"];
 		$this->application_secret = $config["app_secret"];
@@ -48,7 +48,7 @@ class Facebook {
 		
 	}
 	
-	public function getAuthUri($perms){
+	public function getAuthUri($perms = ""){
 		/* 
 			create the url that initiates the authentication process 
 			
@@ -76,7 +76,7 @@ class Facebook {
 		}
 	}
 	
-	public function getAccessToken($params){
+	public function getAccessToken($params = array()){
 		/* a more global way of getting access token
 		
 		  - if redirect_uri and code passed in, will get back from Facebook
@@ -88,7 +88,7 @@ class Facebook {
 			return $this->access_token;
 		}
 		/* not passed in but in request object */
-		if(isset($_REQUEST['code']) && ($params["code"] == "")){
+		if(isset($_REQUEST['code']) && (!isset($params["code"]))){
 			$code = $_REQUEST['code'];			
 		}
 		/* passed in */
@@ -149,19 +149,18 @@ class Facebook {
 		
 	}
 	
-	public function api($object, $params){
+	public function api($object = "string", $params = array()){
 		if(!$object || $object == ""){
 			$object = "me";
 		}
+		$paramstr = "";
 		if(isset($params)){
 			foreach($params as $key=>$value){
-				$paramstr .= $key . "=".$value."&";
+				$paramstr .= "&".$key . "=".urlencode($value);
 			}
-		} else {		
-			$paramstr = "";
-		}
+		} 
 		if($this->access_token){
-			$graph_request = $this->graph_url."/".$object."?access_token=".$this->access_token."&".$paramstr;
+			$graph_request = $this->graph_url."/".$object."?access_token=".$this->access_token.$paramstr;
 			$graph_results = file_get_contents($graph_request);
 			$graph_results = json_decode($graph_results);
 			return $graph_results;
