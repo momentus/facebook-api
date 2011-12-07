@@ -15,7 +15,7 @@ class Facebook {
 	public $graph_url = "https://graph.facebook.com";
 	public $auth_base_url = "https://www.facebook.com";
 
-	function __construct($config = array()) {
+	 public function __construct($config){
 		//setup facebook obj
 		$this->application_id = $config["app_id"];
 		$this->application_secret = $config["app_secret"];
