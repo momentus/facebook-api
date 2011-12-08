@@ -19,10 +19,10 @@ code {color:blue;font-size:18px;margin:5px;display:block;}
 
 $facebook = new Facebook(
 	array(
-	'app_id'=>"109724949144200", 
-	'app_secret'=>"d5dc351dfe3ab85488aebefa881b36fc",
-	'fb_canvas_url'=>"https://apps.facebook.com/annatestappfour/",
-	'redirect_uri'=>"https://apps.facebook.com/annatestappfour/test.php"
+	'app_id'=>"your id", 
+	'app_secret'=>"your secret",
+	'fb_canvas_url'=>"https://apps.facebook.com/yourapp/",
+	'redirect_uri'=>"https://apps.facebook.com/yourapp/test.php"
 	)
 );
 
@@ -31,13 +31,6 @@ $signed_request = $facebook->getSignedRequest();
 ?>
 <h1>FacebookAPI</h1>
 
-These are our favorite methods in the PHP SDK, but opened up publicly, and stripped down so that the method isn't doing any other logic behind the scenes. I was inspired by Koala, the lightweight library for Ruby. The goal in our methods are:
-<ul>
-<li>Enable load balancing on Amazon servers. No single machine dependency. 
-<li>Do not require client cookies- many browsers block third party cookies.
-<li>Allow for a user experience that is both unauthenticated and authenticated. 
-<li>For apps in the frame, tab, canvas, or outside of it.
-</ul>
 
 <h2>First, instantiate the Facebook object:</h2>
 Pass in the application id, secret, canvas URL (if canvas), and the redirect uri. The redirect uri is required for authentication.
@@ -71,11 +64,11 @@ echo $facebook->checkRequest();
 <h2>Authenticate Your App</h2>
 Use this url to log users in, and accept permissions.
 <code>
-$auth_uri = $facebook->getAuthUri(array("publish_stream,user_photos"));
+$auth_uri = $facebook->getAuthUri("publish_stream,user_photos");
 </code>
 <?php 
 
-$auth_uri = $facebook->getAuthUri("","publish_stream,user_photos");
+$auth_uri = $facebook->getAuthUri("publish_stream,user_photos");
 
 ?>
 <center><div class="output"><a href="<?php echo $auth_uri;?>" target="_top">Login to Authenticate App</a></div></center>
@@ -93,9 +86,7 @@ $photos = $facebook->api("me/photos", array("fields"=>"images", "limit"=>"10"));
 if($photos->data){
 	foreach($photos->data as $photo){
 		foreach($photo->images as $image){
-			if(($image->width < 100) && ($image->height < 100)){
-				echo "<img src=\"".$image->source."\" />";
-			}
+			echo "<img src=\"".$image->source."\" />";
 		}
 	}
 }
