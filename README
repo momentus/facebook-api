@@ -64,14 +64,14 @@ This will query the likely subjects for the access token, and assign it to the $
 
 QUERYING THE FACEBOOK SOCIAL GRAPH
 
-$photos = $facebook->api("me");
+$me = $facebook->api("me");
 
 The first argument is the Graph Object-- the User, the photo, the event, etc. The second argument is an array containing any Graph parameters you wish- "since" date to narrow results, here I've passed "limit" to limit the result, and "fields" to show only the attributes of the object I'm interested in.
 
 The result is a standard object format (it's the default json decode format). 
 
 More complex example:
-$photos = $facebook->api("me/photos", array("fields"=>"images", "limit"=>"10"));
+$photos= $facebook->api("me/photos", array("fields"=>"images", "limit"=>"10"));
 
 
 INTEGRATING WITH CODE IGNITER
@@ -79,9 +79,13 @@ INTEGRATING WITH CODE IGNITER
 To integrate with Code Igniter (tested on v. 10.2.1)
 
 1) Copy facebook.php into /libraries
+
 2) Create a configuration directory for your environment in applicationg/config:
+
 "development"
+
 3) Inside there, add a file called "facebook.php"
+
 4) Define the following constants:
 
 $config['app_id'] = "YOUR APP ID";
@@ -90,10 +94,15 @@ $config['fb_canvas_url'] = "PATH TO CANVAS APP IF APPLICABLE";
 $config['redirect_uri'] = "FULL PATH TO REDIRECT URI"; // i.e. http://myapp.com/index.php
 
 5) Edit config/autoload.php, add facebook to the libraries array:
+
 "$autoload['libraries'] = array('facebook');"
 
 6) That should do it- to use the facebook api, on your home page create teh auth link:
+
 $auth_uri = $this->facebook->getAuthUri("publish_stream");
+
 7) On the receiving redirect method, make sure to "
+
 $this->facebook->getAccessToken();
+
 And you can start querying the graph, etc. 
