@@ -76,7 +76,7 @@ $photos= $facebook->api("me/photos", array("fields"=>"images", "limit"=>"10"));
 
 INTEGRATING WITH CODE IGNITER
 
-To integrate with Code Igniter (tested on v. 10.2.1)
+To integrate with Code Igniter (tested on v. 2.1.0)
 
 1) Copy facebook.php into /libraries
 

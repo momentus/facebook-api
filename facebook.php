@@ -34,18 +34,18 @@ class Facebook {
 		   Also, assign to local properties access token and user id if available.
 		*/
 		
-		
-		$signed_request = $_REQUEST['signed_request'];
-		$this->signed_request = $this->parse_signed_request($signed_request);
-
-		/* assign frequently used public properties */
-		$this->uid = $this->signed_request["user_id"];
-		if(isset($this->signed_request["oauth_token"])){
-			/* will only be present if user has already auth'd app and the token is valid */
-			$this->access_token = $this->signed_request["oauth_token"];
-		}
-		return $this->signed_request;
-		
+		if(isset($_REQUEST['signed_request'])){
+			$signed_request = $_REQUEST['signed_request'];
+			$this->signed_request = $this->parse_signed_request($signed_request);
+	
+			/* assign frequently used public properties */
+			$this->uid = $this->signed_request["user_id"];
+			if(isset($this->signed_request["oauth_token"])){
+				/* will only be present if user has already auth'd app and the token is valid */
+				$this->access_token = $this->signed_request["oauth_token"];
+			}
+			return $this->signed_request;
+		}		
 	}
 	
 	public function getAuthUri($perms = ""){
@@ -165,20 +165,35 @@ class Facebook {
 //			$object = "me";
 		}
 		$paramstr = "";
-		if(isset($params["access_token"])){
-			$this->access_token = $params["access_token"];
-			unset($params["access_token"]);
-		}
+
 		if(isset($params)){
 			foreach($params as $key=>$value){
-				$paramstr .= "&".$key . "=".urlencode($value);
+				$paramstr .= "&".$key . "=".urlencode($value);				
 			}
 		} 
+		if($this->access_token && !isset($params["access_token"])){
+			$params["access_token"] = $this->access_token;
+		}
 		if($this->access_token){
-			$graph_request = $this->graph_url."/".$object."?access_token=".$this->access_token.$paramstr;
-			$graph_results = file_get_contents($graph_request);
-			$graph_results = json_decode($graph_results);
-			return $graph_results;
+			if(isset($params["method"]) == "post"){
+				/* uploading mainly */
+				$ch = curl_init();
+				$url = $this->graph_url.'/me/photos?access_token='.$this->access_token;
+				curl_setopt($ch, CURLOPT_URL, $url);
+				curl_setopt($ch, CURLOPT_HEADER, false);
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+				curl_setopt($ch, CURLOPT_POST, true);
+				curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+				$data = curl_exec($ch);
+				//returns the photo id
+				print_r(json_decode($data,true));		
+			} else {
+		
+				$graph_request = $this->graph_url."/".$object."?access_token=".$this->access_token."&".$paramstr;
+				$graph_results = file_get_contents($graph_request);
+				$graph_results = json_decode($graph_results);
+				return $graph_results;
+			}
 		}
 
 	}
