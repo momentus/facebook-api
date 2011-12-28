@@ -162,7 +162,7 @@ class Facebook {
 	
 	public function api($object = "string", $params = array()){
 		if(!$object || $object == ""){
-			$object = "me";
+//			$object = "me";
 		}
 		$paramstr = "";
 		if(isset($params["access_token"])){
