@@ -10,12 +10,13 @@ class Facebook {
 	public $signed_request = "";
 	public $facebook_canvas_url = "";
 	public $redirect_uri;
+	public $config = array();
 	
 	/* two different facebook domains are used in authenticating */
 	public $graph_url = "https://graph.facebook.com";
 	public $auth_base_url = "https://www.facebook.com";
 
-  public function __construct($config){
+  public function __construct($config=array("app_id"=>"","app_secret"=>"")){
 		//setup facebook obj
 		$this->application_id = $config["app_id"];
 		$this->application_secret = $config["app_secret"];
