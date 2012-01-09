@@ -3,14 +3,15 @@
 /* need to add nice facebook api exception handling */
 
 class Facebook {
+	public $access_token = "";
 	public $application_id = "";
 	public $application_secret = "";
 	public $code = "";
-	public $access_token = "";
-	public $signed_request = "";
-	public $facebook_canvas_url = "";
-	public $redirect_uri;
 	public $config = array();
+	public $cookiename = "";
+	public $facebook_canvas_url = "";
+	public $signed_request = "";
+	public $redirect_uri;
 	
 	/* two different facebook domains are used in authenticating */
 	public $graph_url = "https://graph.facebook.com";
@@ -19,6 +20,8 @@ class Facebook {
   public function __construct($config=array("app_id"=>"","app_secret"=>"")){
 		//setup facebook obj
 		$this->application_id = $config["app_id"];
+    $this->cookiename =  'fbsr_'. $config["app_id"];
+
 		$this->application_secret = $config["app_secret"];
 		if(isset($config["fb_canvas_url"])){
 			$this->facebook_canvas_url = $config["fb_canvas_url"];
@@ -26,7 +29,16 @@ class Facebook {
 		if(isset($config["redirect_uri"])){
 			$this->redirect_uri = $config["redirect_uri"];
 		}
+
 	}
+	
+	public function getCookie(){
+		if(isset($_COOKIE[$this->cookiename])){
+			$this->signed_request = $this->parse_signed_request($_COOKIE[$this->cookiename]);	
+		}
+		return $this->signed_request;
+	}
+	
 	
 	public function getSignedRequest(){
 		/* 
@@ -196,9 +208,9 @@ class Facebook {
 				return $graph_results;
 			}
 		}
-
-	}
-
+	} // end api function
+	
+	
 }
 
 
