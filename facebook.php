@@ -198,7 +198,7 @@ class Facebook {
 					$url = $this->graph_url.'/me/photos?access_token='.$this->access_token;
 				} 
 				preg_match('/albums/',$object,$result);
-				if(count(result)>0){
+				if(count($result)>0){
 					$url = $this->graph_url.'/me/albums?access_token='.$this->access_token;
 				}
 				curl_setopt($ch, CURLOPT_URL, $url);
