@@ -52,7 +52,9 @@ class Facebook {
 			$this->signed_request = $this->parse_signed_request($signed_request);
 	
 			/* assign frequently used public properties */
-			$this->uid = $this->signed_request["user_id"];
+			if(isset($this->signed_request["user_id"])){
+				$this->uid = $this->signed_request["user_id"];
+			}
 			if(isset($this->signed_request["oauth_token"])){
 				/* will only be present if user has already auth'd app and the token is valid */
 				$this->access_token = $this->signed_request["oauth_token"];
@@ -191,7 +193,14 @@ class Facebook {
 			if(isset($params["method"]) == "post"){
 				/* uploading mainly */
 				$ch = curl_init();
-				$url = $this->graph_url.'/me/photos?access_token='.$this->access_token;
+				preg_match('/photos/',$object,$result);
+				if(count($result)>0){
+					$url = $this->graph_url.'/me/photos?access_token='.$this->access_token;
+				} 
+				preg_match('/albums/',$object,$result);
+				if(count(result)>0){
+					$url = $this->graph_url.'/me/albums?access_token='.$this->access_token;
+				}
 				curl_setopt($ch, CURLOPT_URL, $url);
 				curl_setopt($ch, CURLOPT_HEADER, false);
 				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
