@@ -195,7 +195,7 @@ class Facebook {
 				$ch = curl_init();
 				preg_match('/photos/',$object,$result);
 				if(count($result)>0){
-					$url = $this->graph_url.'/me/photos?access_token='.$this->access_token;
+					$url = $this->graph_url.$object.'?access_token='.$this->access_token;
 				} 
 				preg_match('/albums/',$object,$result);
 				if(count($result)>0){
